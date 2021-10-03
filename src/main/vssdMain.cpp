@@ -227,7 +227,11 @@ int main(int argc, char *argv[]) {
       size_t block_count;
       if ((cmdin >> block_size) && (cmdin >> block_count)) {
         string d_type;
-        if (cmdin >> d_type) {
+        if (block_size < 32) {
+          error("Block size must be at least 32 bytes");
+        } else if (block_count < 1) {
+          error("Block count must be at least 1");
+        } else if (cmdin >> d_type) {
           if ((d_type == "n") || (d_type == "o")) {
             // file-based
             string fname;
@@ -296,6 +300,7 @@ int main(int argc, char *argv[]) {
           error("read generates an error", blockNumber, ds);
         } else {
           block_util::dump_block(cout, block, disk->blockSize());
+          cout << endl;
         }
       } else {
         error("missing <block_number> for read");

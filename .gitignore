@@ -48,3 +48,6 @@ compile_commands.json
 build
 *.dat
 vssd.code-workspace
+somefile
+somefile2
+.gitignore

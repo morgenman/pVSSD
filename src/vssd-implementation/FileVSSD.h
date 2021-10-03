@@ -15,8 +15,8 @@ class FileVSSD : public VVSSD {
  private:
   std::string fn;
   std::fstream file;
-  size_t bs;
-  size_t bc;
+  unsigned int bs;
+  unsigned int bc;
 
  public:
   FileVSSD(std::size_t block_size, std::size_t block_count,
