@@ -1,18 +1,14 @@
-#include <iostream>
-#include <fstream>
-
-#include <memory>
-
-#include <string>
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <memory>
 #include <sstream>
+#include <string>
 
+#include "UnImplVSSD.h"
 #include "VVSSD.h"
 #include "block_util.h"
 #include "string_util.h"
-#include "UnImplVSSD.h"
-
-
 
 // commented out until they are actually implemented; remove comments
 // as each type of disk is implemented
@@ -25,7 +21,6 @@
 #define has_RAMVSSD 1
 #endif
 using namespace std;
-
 
 // line number in the input; used for reporting errors
 unsigned int line_number = 0;
@@ -53,12 +48,13 @@ unsigned int line_number = 0;
  * @return a pointer to the newly created disk or nullptr.
  */
 unique_ptr<VVSSD> make_disk(string dType, size_t block_size, size_t block_count,
-                            const string & filename = "", bool truncate = false) {
+                            const string &filename = "",
+                            bool truncate = false) {
   if (dType == "UnImplVSSD") {
     return make_unique<UnImplVSSD>(block_size, block_count);
   }
-  // conditionally compile in the FileVSSD code. Only if we included the matching
-  // header file (where we defined the macro as 1)
+  // conditionally compile in the FileVSSD code. Only if we included the
+  // matching header file (where we defined the macro as 1)
 #if has_FileVSSD
   if (dType == "FileVSSD") {
     if (truncate)
@@ -87,14 +83,12 @@ unique_ptr<VVSSD> make_disk(string dType, size_t block_size, size_t block_count,
  * @param blocknumber optional block number to include
  * @param ds optional disk status
  */
-void error(const string & message,
+void error(const string &message,
            VVSSD::blocknumber_t block = VVSSD::NoBlockNumber,
            DiskStatus ds = NO_SUCH_STATUS) {
   cerr << line_number << ": " << message;
-  if (block != VVSSD::NoBlockNumber)
-    cerr << " block[" << block << "]";
-  if (ds != NO_SUCH_STATUS)
-    cerr << " DiskStatus = " << toString(ds);
+  if (block != VVSSD::NoBlockNumber) cerr << " block[" << block << "]";
+  if (ds != NO_SUCH_STATUS) cerr << " DiskStatus = " << toString(ds);
   cerr << endl;
 }
 
@@ -117,7 +111,7 @@ void error(const string & message,
  * string if all goes well; an empty string if there were any
  * problems.
  */
-string read_operand(istream & is) {
+string read_operand(istream &is) {
   string str;
   char ch;
   if (is >> skipws >> ch) {
@@ -150,7 +144,7 @@ string read_operand(istream & is) {
  * @param is the input stream to read
  * @return the parsed disk status of the next token or NO_SUCH_STATUS on error
  */
-DiskStatus read_disk_status(istream & is) {
+DiskStatus read_disk_status(istream &is) {
   string status;
 
   if (is >> status) {
@@ -160,10 +154,9 @@ DiskStatus read_disk_status(istream & is) {
   }
 }
 
-istream & overws(istream & is) {
+istream &overws(istream &is) {
   char ch;
-  if (is >> skipws >> ch)
-    is.unget();
+  if (is >> skipws >> ch) is.unget();
   return is;
 }
 
@@ -175,10 +168,9 @@ istream & overws(istream & is) {
  * @note the passing (and setting of these) as a pair all of the time
  * implies they should be put into a class/struct of some sort.
  */
-void disconnect(unique_ptr<VVSSD> & disk, block_util::BlockPtr & block) {
-  disk = nullptr; // unique_ptr calls the delete automatically
-  if (block != nullptr)
-    delete[] block;
+void disconnect(unique_ptr<VVSSD> &disk, block_util::BlockPtr &block) {
+  disk = nullptr;  // unique_ptr calls the delete automatically
+  if (block != nullptr) delete[] block;
   block = nullptr;
 }
 
@@ -188,6 +180,22 @@ void disconnect(unique_ptr<VVSSD> & disk, block_util::BlockPtr & block) {
 int main(int argc, char *argv[]) {
   unique_ptr<VVSSD> disk = nullptr;
   block_util::BlockPtr block = nullptr;
+  cout << "Welcome to the Very Simple Simulated Disk protocol.\n";
+  cout << "Commands:\n";
+  cout << "\tc <block-size> <block-count> [o <fname> | n <fname> | r]\n";
+  cout << "\t\t(c)onnect to a disk. Either o(pen) an existing filedisk,"
+          "\n\t\tcreate a (n)ew filedisk, or use a (r)AM disk.\n\n";
+  cout << "\tw <block> <data> [s <disk_status>]\n";
+  cout << "\t\t(w)rite the data to the block number. \n\t\tOptionally check "
+          "(s)tatus after operation\n\n";
+  cout << "\tr <block> [x <data>] [s <disk_status>]\n";
+  cout << "\t\t(r)ead the data from the given block number.\n"
+          "\t\tOptionally create block of data from <data> "
+          "and e(x)amine whether \n\t\tthe value matches. If not examined, "
+          "dump the block.\n"
+          "\t\tOptionally check (s)tatus after operation\n\n";
+  cout << "\td\t(d)isconnect from system, shut down any open disks\n\n";
+  cout << "\tq\t(q)uit the simulation\n\n";
 
   const string valid_commands = "cdqrsw";
   string prompt = "cmd: ";
@@ -225,7 +233,8 @@ int main(int argc, char *argv[]) {
             string fname;
             if (cmdin >> fname) {
               bool init = (d_type == "n");
-              disk = make_disk("FileVSSD", block_size, block_count, fname, init);
+              disk =
+                  make_disk("FileVSSD", block_size, block_count, fname, init);
               if (disk->status() == OK) {
                 block = new char[disk->blockSize()];
               } else {
@@ -243,7 +252,7 @@ int main(int argc, char *argv[]) {
           } else if (d_type == "u") {
             disk = make_disk("UnImplVSSD", block_size, block_count);
           } else {
-            error("no disk connected: \""+d_type+"\" unknown disk type");
+            error("no disk connected: \"" + d_type + "\" unknown disk type");
           }
         } else {
           error("no valid disk type for connection");
@@ -251,7 +260,8 @@ int main(int argc, char *argv[]) {
       } else {
         error("missing <block_size> or <block_count> for connection");
       }
-    } else if (disk == nullptr) { // -------------------------------------------
+    } else if (disk ==
+               nullptr) {  // -------------------------------------------
       // no need to process other commands; there is no connected device
       error("no disk currently connected");
       continue;
@@ -294,5 +304,4 @@ int main(int argc, char *argv[]) {
     } else {
     }
   }
-
 }
