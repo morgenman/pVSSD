@@ -57,9 +57,9 @@ unique_ptr<VVSSD> make_disk(string dType, size_t block_size, size_t block_count,
   // matching header file (where we defined the macro as 1)
 #if has_FileVSSD
   if (dType == "FileVSSD") {
-    if (truncate)
+    if (truncate)  // new file
       return make_unique<FileVSSD>(block_size, block_count, filename);
-    else {
+    else {  // existing file
       auto retval = make_unique<FileVSSD>(filename);
       return retval;
     }
