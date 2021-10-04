@@ -1,3 +1,4 @@
+#include <memory>
 #include <string>
 
 #include "VVSSD.h"
@@ -9,10 +10,12 @@
  */
 class RAMVSSD : public VVSSD {
  private:
-  char* data;
-  char* seek;
+  std::unique_ptr<unsigned char[]> data;
+  unsigned char* seek;
   unsigned int bs;
   unsigned int bc;
+  DiskStatus stat = DiskStatus::NOT_READY;
+  void printRAM();
 
  public:
   RAMVSSD(std::size_t block_size, std::size_t block_count);
