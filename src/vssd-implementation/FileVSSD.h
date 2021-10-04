@@ -1,4 +1,15 @@
-
+/**
+ * FileVSSD Provides a Virtual Simple Simulated Disk stored in memory
+ *
+ * This implementation works with the fstream library. It has all the
+ * functionality of RAMVSSD, plus persistence.
+ *
+ * @author Dylan C. Morgen
+ * @email morgendc203@potsdam.edu
+ * @course CIS 310 Operating Systems
+ * @assignment pVSSD
+ * @due 10/4/2021
+ */
 
 #include <fstream>
 #include <iostream>
@@ -6,11 +17,6 @@
 
 #include "VVSSD.h"
 
-/**
- * Example disk implementation to show how to extend a class in C++.
- *
- * All methods indicate that the given function is not implemented.
- */
 class FileVSSD : public VVSSD {
  private:
   std::string fn;
@@ -20,9 +26,23 @@ class FileVSSD : public VVSSD {
   DiskStatus stat = DiskStatus::NOT_READY;
 
  public:
+  /**
+   * FileVSSD Constructor #1
+   * Creates a new file. Truncates if necessary.
+   *
+   * @param  {std::size_t} block_size  : amount of bytes in block
+   * @param  {std::size_t} block_count : amount of blocks
+   * @param  {std::string} filename    : filename
+   */
   FileVSSD(std::size_t block_size, std::size_t block_count,
            std::string filename);
 
+  /**
+   * FileVSSD Constructor #2
+   * Opens an existing file, if header info is set right
+   *
+   * @param  {std::string} filename : filename to open
+   */
   FileVSSD(std::string filename);
 
   virtual ~FileVSSD();

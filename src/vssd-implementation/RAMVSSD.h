@@ -1,12 +1,14 @@
 /**
- * RAMVSSD Provides a Virtual Simple Simulated Disk
+ * RAMVSSD Provides a Virtual Simple Simulated Disk stored in memory
  *
- * Mulitline description describing intent of file
+ * This implementation works using the unique_ptr method in c++
+ * It has all the functionality of the file based implementation aside from
+ * persistence
  *
  * @author Dylan C. Morgen
  * @email morgendc203@potsdam.edu
- * @course CIS XXX Course Name
- * @assignment RAMVSSD.h
+ * @course CIS 310 Operating Systems
+ * @assignment pVSSD
  * @due 10/4/2021
  */
 
@@ -16,11 +18,6 @@
 
 #include "VVSSD.h"
 
-/**
- * Example disk implementation to show how to extend a class in C++.
- *
- * All methods indicate that the given function is not implemented.
- */
 class RAMVSSD : public VVSSD {
  private:
   std::unique_ptr<char[]> data;
@@ -29,16 +26,17 @@ class RAMVSSD : public VVSSD {
   DiskStatus stat = DiskStatus::NOT_READY;
 
   /**
-   * printRAM prints out the ram in HEX. It shows you how data is stored. 
+   * printRAM prints out the ram in HEX. It shows you how data is stored.
    * This is not used by the current implementation, but is useful for
-   * diagnosing issues. 
+   * diagnosing issues.
    */
   void printRAM();
 
  public:
   /**
-   * RAMVSSD is the constructor
-   * 
+   * RAMVSSD is the constructor. It does not have to initalize all bytes to 0,
+   * that happens automatically.
+   *
    * @param  {std::size_t} block_size  : the amount of bytes in each block.
    * @param  {std::size_t} block_count : the amount of blocks
    */
@@ -46,12 +44,11 @@ class RAMVSSD : public VVSSD {
 
   /**
    * ~RAMVSSD is the destructor. Frees memory
-   * 
+   *
    */
   virtual ~RAMVSSD();
 
  public:
-
   /**
    * Return the size (in bytes) of the blocks used by this device.
    *o
