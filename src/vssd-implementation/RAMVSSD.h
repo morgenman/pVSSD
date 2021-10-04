@@ -1,3 +1,16 @@
+/**
+ * RAMVSSD Provides a Virtual Simple Simulated Disk
+ *
+ * Mulitline description describing intent of file
+ *
+ * @author Dylan C. Morgen
+ * @email morgendc203@potsdam.edu
+ * @course CIS XXX Course Name
+ * @assignment RAMVSSD.h
+ * @due 10/4/2021
+ */
+
+#include <cstring>
 #include <memory>
 #include <string>
 
@@ -10,18 +23,35 @@
  */
 class RAMVSSD : public VVSSD {
  private:
-  std::unique_ptr<unsigned char[]> data;
-  unsigned char* seek;
+  std::unique_ptr<char[]> data;
   unsigned int bs;
   unsigned int bc;
   DiskStatus stat = DiskStatus::NOT_READY;
+
+  /**
+   * printRAM prints out the ram in HEX. It shows you how data is stored. 
+   * This is not used by the current implementation, but is useful for
+   * diagnosing issues. 
+   */
   void printRAM();
 
  public:
+  /**
+   * RAMVSSD is the constructor
+   * 
+   * @param  {std::size_t} block_size  : the amount of bytes in each block.
+   * @param  {std::size_t} block_count : the amount of blocks
+   */
   RAMVSSD(std::size_t block_size, std::size_t block_count);
+
+  /**
+   * ~RAMVSSD is the destructor. Frees memory
+   * 
+   */
   virtual ~RAMVSSD();
 
  public:
+
   /**
    * Return the size (in bytes) of the blocks used by this device.
    *o
