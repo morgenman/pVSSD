@@ -8,6 +8,12 @@
  * All methods indicate that the given function is not implemented.
  */
 class RAMVSSD : public VVSSD {
+ private:
+  char* data;
+  char* seek;
+  unsigned int bs;
+  unsigned int bc;
+
  public:
   RAMVSSD(std::size_t block_size, std::size_t block_count);
   virtual ~RAMVSSD();

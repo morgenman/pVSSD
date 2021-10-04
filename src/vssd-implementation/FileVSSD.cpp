@@ -91,27 +91,27 @@ size_t FileVSSD::blockCount() const { return bc; }
 DiskStatus FileVSSD::status() const { return stat; }
 
 DiskStatus FileVSSD::read(blocknumber_t sector, void* buffer) {
-  stat = DiskStatus::NOT_READY;
-  if (sector > bc) {
-    cout << "out of range";
+  if (sector >= bc) {
+    cout << "ERROR: Index out of range\n";
     stat = DiskStatus::BLOCK_OUT_OF_RANGE;
     return stat;
   }
   file.seekg((sector + 1) * bs);
   file.read((std::basic_istream<char>::char_type*)buffer, bs);
-  stat = DiskStatus::OK;
   return stat;
 }
 
 DiskStatus FileVSSD::write(blocknumber_t sector, void* buffer) {
-  if (stat != DiskStatus::OK) {
-    cout
-        << "ERROR: Status is not OK, to avoid data loss writing is disabled.\n";
-    return stat;
-  }
+  // if (stat != DiskStatus::OK) {
+  //   cout
+  //       << "ERROR: Status is not OK, to avoid data loss writing is
+  //       disabled.\n";
+  //   return stat;
+  // }
+
   stat = DiskStatus::NOT_READY;
-  if (sector > bc) {
-    cout << "out of range";
+  if (sector >= bc) {
+    cout << "ERROR: Index out of range\n";
     stat = DiskStatus::BLOCK_OUT_OF_RANGE;
     return stat;
   }
@@ -125,7 +125,7 @@ DiskStatus FileVSSD::write(blocknumber_t sector, void* buffer) {
 DiskStatus FileVSSD::sync() {
   stat = DiskStatus::NOT_READY;
   file.close();
-  file.open(filename, ios::in | ios::out | ios::binary);
+  file.open(fn, ios::in | ios::out | ios::binary);
   stat = DiskStatus::OK;
   return stat;
 }
