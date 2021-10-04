@@ -9,6 +9,7 @@ FileVSSD::FileVSSD(size_t block_size, size_t block_count, string filename) {
   fn = filename;
   bs = block_size;
   bc = block_count;
+
   file.open(filename, ios::in | ios::out | ios::binary | ios::trunc);
   file.write((const char*)&bs, sizeof(bs));
   file.write((const char*)&bc, sizeof(bc));
@@ -46,32 +47,39 @@ FileVSSD::FileVSSD(size_t block_size, size_t block_count, string filename) {
 
 FileVSSD::FileVSSD(string filename) {
   fn = filename;
-  file.open(filename, ios::in | ios::out | ios::binary);
-  char* buffer = new char[4];
-  file.read(buffer, 4);
-  unsigned int value;
-  memcpy(&value, buffer, sizeof(value));
-  bs = value;
-  file.read(buffer, 4);
-  memcpy(&value, buffer, sizeof(value));
-  bc = value;
 
+  file.open(filename, ios::in | ios::out | ios::binary);
   file.seekg(0);
   std::streampos fsize = 0;
   fsize = file.tellg();
-
   file.seekg(0, std::ios::end);
   fsize = file.tellg() - fsize;
-  if (fsize != bs * (bc + 1)) {
+  file.seekg(0);
+  if (fsize == 0) {
+    cout << "ERROR: File '" << filename
+         << "' does not exist. Unable to open.\n";
     stat = DiskStatus::ERROR;
-    cout << "ERROR: File size does not match header information.\n";
-    cout << "\tFile size is: " << fsize << " Bytes.\n";
-    cout << "\tExpected file size is: " << bs * (bc + 1)
-         << " Bytes (8 Bytes for Geometry, " << bs - 8
-         << " Bytes for the signature, \n\tand " << bs * bc
-         << " Bytes for data) \n";
-  } else
-    stat = DiskStatus::OK;
+  } else {
+    char* buffer = new char[4];
+    file.read(buffer, 4);
+    unsigned int value;
+    memcpy(&value, buffer, sizeof(value));
+    bs = value;
+    file.read(buffer, 4);
+    memcpy(&value, buffer, sizeof(value));
+    bc = value;
+
+    if (fsize != bs * (bc + 1)) {
+      stat = DiskStatus::ERROR;
+      cout << "ERROR: File size does not match header information.\n";
+      cout << "\tFile size is: " << fsize << " Bytes.\n";
+      cout << "\tExpected file size is: " << bs * (bc + 1)
+           << " Bytes (8 Bytes for Geometry, " << bs - 8
+           << " Bytes for the signature, \n\tand " << bs * bc
+           << " Bytes for data) \n";
+    } else
+      stat = DiskStatus::OK;
+  }
 }
 
 FileVSSD::~FileVSSD() { file.close(); }
@@ -114,4 +122,10 @@ DiskStatus FileVSSD::write(blocknumber_t sector, void* buffer) {
   return stat;
 }
 
-DiskStatus FileVSSD::sync() { return DiskStatus::NOT_YET_IMPLEMENTED; }
+DiskStatus FileVSSD::sync() {
+  stat = DiskStatus::NOT_READY;
+  file.close();
+  file.open(filename, ios::in | ios::out | ios::binary);
+  stat = DiskStatus::OK;
+  return stat;
+}
