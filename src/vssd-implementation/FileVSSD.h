@@ -17,6 +17,7 @@ class FileVSSD : public VVSSD {
   std::fstream file;
   unsigned int bs;
   unsigned int bc;
+  DiskStatus stat = DiskStatus::NOT_READY;
 
  public:
   FileVSSD(std::size_t block_size, std::size_t block_count,
@@ -32,7 +33,7 @@ class FileVSSD : public VVSSD {
    * @return 0 and set status if the disk is not ready; number of bytes
    *         per sector otherwise.
    */
-  virtual std::size_t blockSize() const;
+  std::size_t blockSize() const;
 
   /**
    * Return the total number of blocks on the disk.
@@ -40,12 +41,12 @@ class FileVSSD : public VVSSD {
    * @return 0 and set status if the disk is not ready; number of
    *         sectors otherwise.
    */
-  virtual std::size_t blockCount() const;
+  std::size_t blockCount() const;
 
   /**
    * Return the status of the disk (typically the last call).
    */
-  virtual DiskStatus status() const;
+  DiskStatus status() const;
 
   /**
    * Read indicated block if possible.

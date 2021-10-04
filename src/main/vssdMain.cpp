@@ -184,7 +184,8 @@ int main(int argc, char *argv[]) {
   cout << "Commands:\n";
   cout << "\tc <block-size> <block-count> [o <fname> | n <fname> | r]\n";
   cout << "\t\t(c)onnect to a disk. Either o(pen) an existing filedisk,"
-          "\n\t\tcreate a (n)ew filedisk, or use a (r)AM disk.\n\n";
+          "\n\t\tcreate a (n)ew filedisk, or use a (r)AM disk."
+          "\n\t\tNote: size and count are ignored if the o flag is used.\n\n";
   cout << "\tw <block> <data> [s <disk_status>]\n";
   cout << "\t\t(w)rite the data to the block number. \n\t\tOptionally check "
           "(s)tatus after operation\n\n";
@@ -306,6 +307,7 @@ int main(int argc, char *argv[]) {
         error("missing <block_number> for read");
       }
     } else if (cmd == "s") {
+      cout << toString(disk->status()) << "\n";
     } else {
     }
   }
